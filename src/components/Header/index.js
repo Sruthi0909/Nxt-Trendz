@@ -8,10 +8,17 @@ import './index.css'
 const Header = props => {
   const onClickLogout = () => {
     const {history} = props
+
+    // Record logout time in IST
+    const logoutTime = new Date().toLocaleString('en-IN', {
+      timeZone: 'Asia/Kolkata',
+    })
+    localStorage.setItem('logoutTime', logoutTime) // Save to localStorage
+
+    // Remove the JWT token and redirect
     Cookies.remove('jwt_token')
     history.replace('/login')
   }
-
   const renderCartItemsCount = () => (
     <CartContext.Consumer>
       {value => {

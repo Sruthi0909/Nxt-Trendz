@@ -20,12 +20,16 @@ class LoginForm extends Component {
     this.setState({password: event.target.value})
   }
 
-  onSubmitSuccess = jwtToken => {
+  onSubmitSuccess = async jwtToken => {
     const {history} = this.props
-
-    Cookies.set('jwt_token', jwtToken, {
-      expires: 30,
+    const loginTime = new Date().toLocaleString('en-IN', {
+      timeZone: 'Asia/Kolkata',
     })
+
+    // Save login time in localStorage
+    localStorage.setItem('loginTime', loginTime)
+
+    Cookies.set('jwt_token', jwtToken, {expires: 30})
     history.replace('/')
   }
 

@@ -1,6 +1,5 @@
-import {Component} from 'react'
+import React, {Component} from 'react'
 import {Route, Switch, Redirect} from 'react-router-dom'
-
 import LoginForm from './components/LoginForm'
 import Home from './components/Home'
 import Products from './components/Products'
@@ -15,6 +14,41 @@ import './App.css'
 class App extends Component {
   state = {
     cartList: [],
+    sessionViews: 0,
+    loginTime: null,
+    logoutTime: null,
+  }
+
+  componentDidMount() {
+    this.fetchSessionData()
+    const loginTime = localStorage.getItem('loginTime')
+    const logoutTime = localStorage.getItem('logoutTime')
+    this.setState({loginTime, logoutTime})
+  }
+
+  fetchSessionData = async () => {
+    try {
+      const response = await fetch('/api/session')
+      if (!response.ok) {
+        throw new Error('Network response was not ok')
+      }
+      const data = await response.json()
+      this.setState({sessionViews: data.views})
+    } catch (error) {
+      console.error('Fetch session data failed:', error)
+    }
+  }
+
+  handleLogin = () => {
+    const loginTime = new Date().toISOString()
+    localStorage.setItem('loginTime', loginTime)
+    this.setState({loginTime})
+  }
+
+  handleLogout = () => {
+    const logoutTime = new Date().toISOString()
+    localStorage.setItem('logoutTime', logoutTime)
+    this.setState({logoutTime})
   }
 
   removeAllCartItems = () => {
@@ -86,7 +120,7 @@ class App extends Component {
   }
 
   render() {
-    const {cartList} = this.state
+    const {cartList, loginTime, logoutTime} = this.state
 
     return (
       <CartContext.Provider
@@ -112,6 +146,10 @@ class App extends Component {
           <Route path="/not-found" component={NotFound} />
           <Redirect to="not-found" />
         </Switch>
+        <footer>
+          <p>Login Time: {loginTime || 'Not logged in'}</p>
+          <p>Logout Time: {logoutTime || 'Not logged out'}</p>
+        </footer>
       </CartContext.Provider>
     )
   }
